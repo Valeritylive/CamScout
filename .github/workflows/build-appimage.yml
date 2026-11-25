@@ -101,11 +101,11 @@ jobs:
         run: |
           flatpak run --command=flatpak-builder-lint org.flatpak.Builder repo repo > lint.json || true
           cat lint.json
-          # appid-url-not-reachable and the screenshot mirror checks only pass on Flathub's own builders.
+          # appid-url-not-reachable and the screenshot mirror/URL checks only pass on Flathub's own builders.
           python3 - lint.json <<'PY'
           import json, sys
           known = {"appid-url-not-reachable", "appstream-screenshots-not-mirrored-in-ostree",
-                   "appstream-missing-screenshots"}
+                   "appstream-missing-screenshots", "appstream-external-screenshot-url"}
           text = open(sys.argv[1]).read().strip()
           data = json.loads(text) if text else {}
           errors = sorted(set(data.get("errors", [])) - known)
