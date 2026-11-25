@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=CamScout
+GenericName=IP Camera Setup
+GenericName[ru]=Настройка IP-камер
+Comment=Find, activate and configure Dahua and Hikvision cameras and recorders
+Comment[ru]=Поиск, активация и настройка камер и регистраторов Dahua и Hikvision
+Exec=camscout
+Icon=io.github.Valeritylive.CamScout
+Terminal=false
+Categories=Network;
+Keywords=camera;cctv;ip;nvr;dvr;activate;network;sadp;dahua;hikvision;dhip;
+Keywords[ru]=камера;видеонаблюдение;регистратор;активация;сеть;sadp;dahua;hikvision;
+StartupNotify=true

@@ -1,0 +1,161 @@
+name: Build Linux packages
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Опубликовать GitHub Release v<VERSION> с собранными пакетами'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          version="$(tr -d '[:space:]' < VERSION)"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "Тег $GITHUB_REF_NAME не совпадает с файлом VERSION ($version)" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python for tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run tests
+        run: |
+          python -m pip install --quiet requests cryptography qrcode
+          python -m unittest discover -s tests
+
+      - name: Install AppImage host tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y file wget libfuse2
+
+      - name: Build AppImage
+        run: bash build-appimage.sh
+
+      - name: Build Debian package
+        run: bash build-deb.sh
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: CamScout-x86_64-AppImage
+          path: dist/CamScout-x86_64.AppImage
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: CamScout-amd64-DEB
+          path: dist/camscout_${{ steps.version.outputs.version }}-1_amd64.deb
+          if-no-files-found: error
+          retention-days: 30
+
+  flatpak:
+    runs-on: ubuntu-24.04
+    env:
+      APP_ID: io.github.Valeritylive.CamScout
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Flatpak tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y --noninteractive flathub org.flatpak.Builder
+
+      - name: Lint manifest
+        run: flatpak run --command=flatpak-builder-lint org.flatpak.Builder --exceptions manifest "flatpak/$APP_ID.yml" || true
+
+      - name: Build Flatpak
+        run: |
+          mkdir -p dist
+          flatpak-builder --user --install-deps-from=flathub --force-clean --disable-rofiles-fuse \
+            --repo=repo build-dir "flatpak/$APP_ID.yml"
+          flatpak build-bundle repo dist/CamScout-x86_64.flatpak "$APP_ID" \
+            --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Lint build
+        run: |
+          flatpak run --command=flatpak-builder-lint org.flatpak.Builder repo repo > lint.json || true
+          cat lint.json
+          # appid-url-not-reachable and the screenshot mirror checks only pass on Flathub's own builders.
+          python3 - lint.json <<'PY'
+          import json, sys
+          known = {"appid-url-not-reachable", "appstream-screenshots-not-mirrored-in-ostree",
+                   "appstream-missing-screenshots"}
+          text = open(sys.argv[1]).read().strip()
+          data = json.loads(text) if text else {}
+          errors = sorted(set(data.get("errors", [])) - known)
+          if errors:
+              sys.exit("flatpak-builder-lint errors: " + ", ".join(errors))
+          PY
+
+      - name: Upload Flatpak bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: CamScout-x86_64-Flatpak
+          path: dist/CamScout-x86_64.flatpak
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    needs: [build, flatpak]
+    if: github.ref_type == 'tag' || (github.event_name == 'workflow_dispatch' && inputs.release)
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release
+        run: |
+          tag="v$VERSION"
+          notes="release-notes/$tag.md"
+          if [[ ! -f "$notes" ]]; then
+            echo "Нет заметок к релизу: $notes" >&2
+            exit 1
+          fi
+          chmod +x dist/CamScout-x86_64.AppImage
+          assets=(dist/CamScout-x86_64.AppImage "dist/camscout_${VERSION}-1_amd64.deb" dist/CamScout-x86_64.flatpak)
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${assets[@]}" --clobber
+          else
+            gh release create "$tag" "${assets[@]}" \
+              --target "$GITHUB_SHA" \
+              --title "CamScout $tag" \
+              --notes-file "$notes" \
+              --latest
+          fi

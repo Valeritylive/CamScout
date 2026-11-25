@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.Valeritylive.CamScout</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>CamScout</name>
+  <summary>Find and set up Dahua and Hikvision cameras</summary>
+  <summary xml:lang="ru">Поиск и настройка камер Dahua и Hikvision</summary>
+  <developer id="io.github.valeritylive">
+    <name>Valeritylive</name>
+  </developer>
+  <description>
+    <p>
+      CamScout discovers Dahua and Hikvision IP cameras, video recorders and intercoms
+      on the local network (Dahua DHIP and Hikvision SADP discovery) and lets you bring
+      them into service without a Windows machine. Each device is marked with its brand.
+    </p>
+    <p xml:lang="ru">
+      CamScout находит в локальной сети IP-камеры, видеорегистраторы и домофоны Dahua и
+      Hikvision (обнаружение DHIP и SADP) и позволяет ввести их в работу без Windows.
+      Каждое устройство помечено брендом.
+    </p>
+    <ul>
+      <li>List devices with model, status, addresses, ports, firmware version and serial number</li>
+      <li xml:lang="ru">Список устройств с моделью, статусом, адресами, портами, версией прошивки и серийным номером</li>
+      <li>Activate new devices and set the administrator password</li>
+      <li xml:lang="ru">Активация новых устройств и задание пароля администратора</li>
+      <li>Change IP address, mask, gateway, ports and DHCP, also for devices in another subnet</li>
+      <li xml:lang="ru">Смена IP-адреса, маски, шлюза, портов и DHCP, в том числе для устройств в другой подсети</li>
+      <li>Export the device list to CSV</li>
+      <li xml:lang="ru">Экспорт списка устройств в CSV</li>
+      <li>Password reset: Dahua QR code and security code, Hikvision request and response files</li>
+      <li xml:lang="ru">Сброс пароля: QR-код и код безопасности Dahua, файлы запроса и ответа Hikvision</li>
+      <li>Device settings, firmware upgrade (Dahua) and RTSP live view</li>
+      <li xml:lang="ru">Настройки устройств, обновление прошивки (Dahua) и просмотр видео по RTSP</li>
+      <li>Interface in English, Russian, German, Spanish and Armenian</li>
+      <li xml:lang="ru">Интерфейс на английском, русском, немецком, испанском и армянском</li>
+      <li>Command-line mode for scripts and servers</li>
+      <li xml:lang="ru">Режим командной строки для скриптов и серверов</li>
+    </ul>
+    <p>
+      This is an independent project. It is not affiliated with or endorsed by any camera manufacturer.
+    </p>
+    <p xml:lang="ru">
+      Это независимый проект, не связанный с производителями камер.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.Valeritylive.CamScout.desktop</launchable>
+  <provides>
+    <binary>camscout</binary>
+  </provides>
+  <url type="homepage">https://github.com/Valeritylive/CamScout</url>
+  <url type="bugtracker">https://github.com/Valeritylive/CamScout/issues</url>
+  <url type="vcs-browser">https://github.com/Valeritylive/CamScout</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Device list and network settings</caption>
+      <image>https://raw.githubusercontent.com/Valeritylive/CamScout/main/docs/screenshots/main-window.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1"/>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+  <requires>
+    <display_length compare="ge">768</display_length>
+  </requires>
+  <branding>
+    <color type="primary" scheme_preference="light">#d9f2b3</color>
+    <color type="primary" scheme_preference="dark">#2f4f12</color>
+  </branding>
+  <releases>
+    <release version="2.0.0" date="2026-11-25">
+      <description>
+        <ul>
+          <li>Dahua and Hikvision devices in one application, with a brand mark in the list</li>
+          <li>Interface languages: English, Russian, German, Spanish and Armenian</li>
+          <li>New lime green accent color and icon</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.2.0" date="2026-11-25">
+      <description>
+        <ul>
+          <li>Renamed to CamScout</li>
+          <li>Flatpak package</li>
+          <li>Released under the MIT license</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.1.0" date="2026-11-25">
+      <description>
+        <ul>
+          <li>Main window laid out like the Windows SADP tool</li>
+          <li>Experimental native SADP activation and network changes over UDP</li>
+          <li>Command-line mode</li>
+          <li>First version of password reset</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.0" date="2026-11-17"/>
+  </releases>
+</component>
