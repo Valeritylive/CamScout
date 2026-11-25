@@ -62,27 +62,13 @@ Categories=Utility;Network;
 StartupNotify=true
 DESKTOP
 
+install -m 0755 "$ROOT_DIR/packaging/run.sh" "$APPDIR/usr/share/camscout/run.sh"
+
 cat > "$APPDIR/AppRun" <<'APPRUN'
 #!/usr/bin/env bash
-set -e
 HERE="$(dirname -- "$(readlink -f -- "$0")")"
-PREFIX="$HERE/usr/conda"
-APP="$HERE/usr/share/camscout/app.py"
-
-if [[ ! -x "$PREFIX/bin/python" ]]; then
-  echo "Не найден встроенный Python. Пересоберите AppImage." >&2
-  exit 1
-fi
-
-export PATH="$PREFIX/bin:$PATH"
-export LD_LIBRARY_PATH="$PREFIX/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-export GI_TYPELIB_PATH="$PREFIX/lib/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
-export GST_PLUGIN_PATH_1_0="$PREFIX/lib/gstreamer-1.0"
-export GST_PLUGIN_SYSTEM_PATH_1_0="$PREFIX/lib/gstreamer-1.0"
-export GSETTINGS_SCHEMA_DIR="$PREFIX/share/glib-2.0/schemas"
-export GST_REGISTRY_1_0="${XDG_CACHE_HOME:-$HOME/.cache}/camscout-gst.bin"
-
-exec "$PREFIX/bin/python" "$APP" "$@"
+export CAMSCOUT_PREFIX="$HERE/usr/conda"
+exec "$HERE/usr/share/camscout/run.sh" "$@"
 APPRUN
 chmod 0755 "$APPDIR/AppRun"
 

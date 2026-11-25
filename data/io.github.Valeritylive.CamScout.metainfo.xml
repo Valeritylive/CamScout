@@ -71,6 +71,13 @@
     <color type="primary" scheme_preference="dark">#2f4f12</color>
   </branding>
   <releases>
+    <release version="2.0.1" date="2026-11-25">
+      <description>
+        <ul>
+          <li>Fixed a crash at start of the .deb and AppImage packages (fonts and keyboard maps were looked up at the build machine path)</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.0" date="2026-11-25">
       <description>
         <ul>
