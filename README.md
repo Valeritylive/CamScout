@@ -50,7 +50,7 @@ flatpak run io.github.Valeritylive.CamScout
 chmod +x CamScout-x86_64.AppImage && ./CamScout-x86_64.AppImage
 
 # Debian/Ubuntu (заменяет пакеты hikvision-device-manager и dahua-device-manager)
-sudo apt install ./camscout_2.0.0-1_amd64.deb
+sudo apt install ./camscout_2.0.1-1_amd64.deb
 ```
 
 Собрать вручную: `bash build-appimage.sh`, затем `bash build-deb.sh`; Flatpak — `flatpak-builder --user --install-deps-from=flathub --force-clean --install build-dir flatpak/io.github.Valeritylive.CamScout.yml`. Версия берётся из файла `VERSION`, заметки к релизу лежат в `release-notes/`.

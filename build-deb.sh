@@ -25,22 +25,13 @@ cp -a "$APPDIR/usr/conda" "$PACKAGE_ROOT/opt/camscout/conda"
 # Conda's package download cache is only needed while building, not at runtime.
 rm -rf -- "$PACKAGE_ROOT/opt/camscout/conda/pkgs"
 cp -a "$APPDIR/usr/share/camscout/." "$PACKAGE_ROOT/opt/camscout/"
+chmod 0755 "$PACKAGE_ROOT/opt/camscout/run.sh"
 install -m 0644 "$APPDIR/usr/share/icons/hicolor/scalable/apps/io.github.Valeritylive.CamScout.svg" \
   "$PACKAGE_ROOT/usr/share/icons/hicolor/scalable/apps/"
 
 cat > "$PACKAGE_ROOT/usr/bin/camscout" <<'LAUNCHER'
 #!/usr/bin/env bash
-set -e
-PREFIX="/opt/camscout/conda"
-APP="/opt/camscout/app.py"
-export PATH="$PREFIX/bin:$PATH"
-export LD_LIBRARY_PATH="$PREFIX/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-export GI_TYPELIB_PATH="$PREFIX/lib/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
-export GST_PLUGIN_PATH_1_0="$PREFIX/lib/gstreamer-1.0"
-export GST_PLUGIN_SYSTEM_PATH_1_0="$PREFIX/lib/gstreamer-1.0"
-export GSETTINGS_SCHEMA_DIR="$PREFIX/share/glib-2.0/schemas"
-export GST_REGISTRY_1_0="${XDG_CACHE_HOME:-$HOME/.cache}/camscout-gst.bin"
-exec "$PREFIX/bin/python" "$APP" "$@"
+exec /opt/camscout/run.sh "$@"
 LAUNCHER
 chmod 0755 "$PACKAGE_ROOT/usr/bin/camscout"
 # Old command name from releases before the rename to CamScout.
